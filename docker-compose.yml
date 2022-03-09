@@ -1,0 +1,67 @@
+version: "3"
+
+volumes:
+  lightning_data:
+  c13n_data:
+
+services:
+  lnd:
+    container_name: c13n_lnd
+    image: lightninglabs/lnd:v0.14.2-beta
+    restart: unless-stopped
+    command: [
+      "lnd",
+      "--configfile=/lndconf/lnd.conf"
+    ]
+    ports:
+      - "8083:8083"
+      - "10009:10009"
+      - "9735:9735"
+    volumes:
+      - lightning_data:/root/.lnd
+      - ./lnd/conf/lnd.conf:/lndconf/lnd.conf
+    profiles:
+      - lnd
+
+  arc:
+    container_name: c13n_arc
+    image: ghcr.io/c13n-io/arc:latest
+    restart: unless-stopped
+    profiles:
+      - arc
+    
+  c13n:
+    container_name: c13n_c13n-go
+    image: ghcr.io/c13n-io/c13n-go:latest
+    restart: unless-stopped
+    ports:
+      - "9999:9999"
+    volumes:
+      - lightning_data:/shared:ro
+      - c13n_data:/c13n_data:rw
+      - ./c13n/conf/config.yml:/etc/c13n/c13n.yml
+      - ./c13n/conf/store.key:/etc/c13n/store.key
+      - ./c13n/certs/c13n.key:/etc/c13n/c13n.key
+      - ./c13n/certs/c13n.pem:/etc/c13n/c13n.pem
+
+    command: [
+      "--config=/etc/c13n/c13n.yml"
+    ]
+    profiles:
+      - c13n-go
+
+  envoy:
+    container_name: c13nStack_envoy
+    image: envoyproxy/envoy:v1.17.0
+    restart: unless-stopped
+    volumes:
+      - ./envoy/conf/envoy.yml:/etc/envoy/envoy.yaml
+      - ./envoy/certs/envoy.key:/etc/envoy/envoy.key
+      - ./envoy/certs/envoy.crt:/etc/envoy/envoy.crt
+      - ./c13n/certs/c13n.pem:/etc/c13n/c13n.pem
+    ports:
+      - "443:9081" # HTTPS reverse proxy
+    profiles:
+      - envoy
+      - arc
+      - c13n-go

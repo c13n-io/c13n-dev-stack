@@ -1,0 +1,25 @@
+# General options
+# Accepted log levels: "panic", "fatal", "error", "warn", "info", "debug", "trace"
+log_level: "debug"
+# Server configuration
+server:
+  address: "0.0.0.0:9999"
+  tls:
+    cert_path: "/etc/c13n/c13n.pem"
+    key_path:  "/etc/c13n/c13n.key"
+  user: example
+  pass: replaceme
+  graceful_shutdown_timeout: 10
+# LN service configuration
+lnd:
+  address: "lnd:10009"
+  tls_path: "/shared/tls.cert"
+  macaroon_path: "/shared/data/chain/bitcoin/testnet/admin.macaroon"
+# Application configuration
+app:
+  default_fee_limit_msat: 3000
+# Database configuration
+database:
+  db_path: "/c13n_data/c13n.db"
+  # Master DB encryption key of fixed length (16, 24, 32 bytes)
+  key_path: "/etc/c13n/store.key"
