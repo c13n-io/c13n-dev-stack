@@ -8,7 +8,8 @@ server:
     cert_path: "/etc/c13n/c13n.pem"
     key_path:  "/etc/c13n/c13n.key"
   user: example
-  pass: $2a$10$lLGz4HESshvQp0XpPZXKMOCAi9twPBmn6cx3zan6aDUm83C2hfqMq # bcrypt hash for replaceme password
+  # bcrypt hash for replaceme password
+  pwdhash: '$2a$10$Snp.CkDN6a98Z/7xITd5nOaXUnN6JMXUG5863h19fLgWUS8hTIDdi'
   graceful_shutdown_timeout: 10
 # LN service configuration
 lnd:
